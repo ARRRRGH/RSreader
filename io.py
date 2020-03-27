@@ -2,7 +2,7 @@ try:
     from base.readers import _RasterReader
 except ModuleNotFoundError:
     import RSreader
-    from RSreader.preproc.readers import _RasterReader
+    from RSreader.base.readers import _RasterReader
 
 import rasterio as rio
 
