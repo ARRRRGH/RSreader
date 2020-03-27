@@ -141,7 +141,9 @@ class _RasterReader(_Reader):
                 # make bbox that is returned
                 out_bbox = BBox.from_tif(path)
 
-                ret.attrs['crs'] = dict(rio.crs.CRS.from_string(ret.crs))
+                if 'crs' in ret.attrs:
+                    ret.attrs['crs'] = dict(rio.crs.CRS.from_string(ret.crs))
+
                 ret.attrs['path'] = path
 
                 out_xarrs.append(ret)
