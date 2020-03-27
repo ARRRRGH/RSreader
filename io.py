@@ -42,10 +42,10 @@ def align(arr1, arr2, path_wrp, no_data=-1):
     kwargs.update({
         'crs': arr1.attrs['crs'],
         'transform': arr1.attrs['transform'],
-        'width': arr1.shape[-1],
-        'height': arr1.shape[-2],
+        'width': arr1.sizes['x'],
+        'height': arr1.sizes['y'],
         'driver': 'GTiff',
-        'count': arr2.shape[0],
+        'count': arr2.sizes['band'],
         'dtype': arr2.dtype,
     })
     try:
@@ -56,7 +56,7 @@ def align(arr1, arr2, path_wrp, no_data=-1):
     with rio.open(path_wrp, 'w', **kwargs) as dst:
         rio.warp.reproject(
             source=arr2.data,
-            destination=rio.band(dst, arr2.shape[0]),
+            destination=rio.band(dst, arr2.sizes['band']),
             src_transform=arr2.transform,
             src_crs=arr2.crs,
             dst_transform=arr1.transform,
