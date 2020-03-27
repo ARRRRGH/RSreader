@@ -23,7 +23,7 @@ from tqdm import tqdm
 try:
     from base.bbox import BBox
 except ModuleNotFoundError:
-    from RSreader.base import BBox
+    from RSreader.base.bbox import BBox
 
 
 def rasterio_to_xarray(arr, meta, tmp_dir='.', fil_name=None, chunks=None, out=False, *args, **kwargs):
