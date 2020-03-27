@@ -20,7 +20,10 @@ from rasterio.vrt import WarpedVRT
 
 from tqdm import tqdm
 
-from base.bbox import BBox
+try:
+    from base.bbox import BBox
+except ModuleNotFoundError:
+    from RSreader.base import BBox
 
 
 def rasterio_to_xarray(arr, meta, tmp_dir='.', fil_name=None, chunks=None, out=False, *args, **kwargs):
