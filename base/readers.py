@@ -66,7 +66,7 @@ class _RasterReader(_Reader):
         _Reader.__init__(self, path, bbox=bbox, time=time)
 
     def read(self, paths=None, bbox=None, align=False, crs=None, chunks=None,
-             out=False, out_dir='./out', mute=False, *args, **kwargs):
+             out=False, out_dir='./out', mute=False, cast_dtype=None, *args, **kwargs):
 
         bbox = self._which_bbox(bbox)
 
@@ -130,6 +130,9 @@ class _RasterReader(_Reader):
                     if is_query_dir_new:
                         os.removedirs(query_dir)
 
+                if cast_dtype is not None:
+                    ret.data = ret.data.astype(cast_dtype)
+
                 out_xarrs.append(ret)
                 out_bboxs.append(bbox)
 
@@ -145,6 +148,9 @@ class _RasterReader(_Reader):
                     ret.attrs['crs'] = dict(rio.crs.CRS.from_string(ret.attrs['crs']))
 
                 ret.attrs['path'] = path
+
+                if cast_dtype is not None:
+                    ret.data = ret.data.astype(cast_dtype)
 
                 out_xarrs.append(ret)
                 out_bboxs.append(out_bbox)
