@@ -27,7 +27,7 @@ def write_out(arr, dst_path, default_meta):
     # context manager.
     with rio.Env():
         with rio.open(dst_path, 'w', **meta) as dst:
-            dst.write(arr.data, 1)
+            dst.write(arr.data)
 
     arr.attrs['path'] = dst_path
     return arr
