@@ -66,7 +66,8 @@ class _RasterReader(_Reader):
         _Reader.__init__(self, path, bbox=bbox, time=time)
 
     def read(self, paths=None, bbox=None, align=False, crs=None, chunks=None,
-             out=False, out_dir='./out', mute=False, cast_dtype=None, *args, **kwargs):
+             out=False, out_dir='./out', mute=False, cast_dtype=None, force_warp=False,
+             *args, **kwargs):
 
         bbox = self._which_bbox(bbox)
 
@@ -102,7 +103,7 @@ class _RasterReader(_Reader):
                 crs = crs if crs is not None else fil_crs
 
                 # warp image
-                if crs != fil_crs:
+                if crs != fil_crs or force_warp:
 
                     # path arithmetic
                     fil, ext = os.path.splitext(os.path.basename(fil_name))

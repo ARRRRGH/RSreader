@@ -1,10 +1,14 @@
 try:
-    from base.readers import _RasterReader
+    from base.readers import _RasterReader, _TimeRasterReader
 except ModuleNotFoundError:
     import RSreader
-    from RSreader.base.readers import _RasterReader
+    from RSreader.base.readers import _RasterReader, _TimeRasterReader
 
 import rasterio as rio
+import glob
+import re
+import os
+import datetime as dt
 
 
 def read_raster(path, bbox=None, *args, **kwargs):
@@ -73,3 +77,38 @@ def align(arr1, arr2, path_wrp, no_data=-1):
     algned.attrs['path'] = path_wrp
 
     return algned
+
+
+class TIFTimeReader(_TimeRasterReader):
+    def __init__(self, time_pattern, incl_pattern='.*', match_to_date=None, *args, **kwargs):
+        self.time_pattern = time_pattern
+        self.incl_pattern = incl_pattern
+        self.match_to_date = match_to_date
+
+        _TimeRasterReader.__init__(self, *args, **kwargs)
+
+    def _create_path_dict(self):
+        fnames = glob.glob(os.path.join(self.path, '*.tif'))
+
+        acc = []
+        for f in fnames:
+            if len(re.findall(self.incl_pattern, f)) != 0:
+                acc.append(f)
+
+        path_dict = {}
+        for i, fname in enumerate(acc):
+            if self.match_to_date is None:
+                date = (re.findall(self.time_pattern, fname)[-1]).replace('_', '').replace('-', '')
+                year = int(date[:4])
+                month = int(date[4:6])
+                day = int(date[6:8])
+                path_dict[os.path.join(self.path, fname)] = dt.datetime(year=year, month=month, day=day)
+
+            elif type(self.match_to_date) is dict:
+                date = re.search(self.time_pattern, fname)
+                path_dict[os.path.join(self.path, fname)] = dt.datetime(**{name: int(date.group(i)) for name, i in
+                                                                           self.match_to_date})
+            else:
+                path_dict[os.path.join(self.path, fname)] = self.match_to_date(fname)
+                
+        return path_dict
