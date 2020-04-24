@@ -9,6 +9,7 @@ import glob
 import re
 import os
 import datetime as dt
+from collections import OrderedDict
 
 
 def read_raster(path, bbox=None, *args, **kwargs):
@@ -95,7 +96,7 @@ class TIFTimeReader(_TimeRasterReader):
             if len(re.findall(self.incl_pattern, f)) != 0:
                 acc.append(f)
 
-        path_dict = {}
+        path_dict = OrderedDict()
         for i, fname in enumerate(acc):
             if self.match_to_date is None:
                 date = (re.findall(self.time_pattern, fname)[-1]).replace('_', '').replace('-', '')

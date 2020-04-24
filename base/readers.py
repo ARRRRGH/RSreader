@@ -249,8 +249,8 @@ class _TimeRasterReader(_RasterReader):
         self.min_time = min(self._path_dict.values())
         self.max_time = max(self._path_dict.values())
 
-    def query(self, bbox=None, time=None, align=False, crs=None, *args, **kwargs):
-        paths, times = self._prepare_query(time=time)
+    def query(self, bbox=None, time=None, align=False, crs=None, index=None, *args, **kwargs):
+        paths, times = self._prepare_query(time=time, index=None)
         arrs, bboxs = self.read(paths, bbox=bbox, align=align, crs=crs, *args, **kwargs)
 
         ret = xr.concat(arrs, 'time')
@@ -262,24 +262,29 @@ class _TimeRasterReader(_RasterReader):
 
         return ret, bboxs
 
-    def _prepare_query(self, time=None, *args, **kwargs):
+    def _prepare_query(self, time=None, index=None, *args, **kwargs):
         time = self._which_time(time)
 
-        if time is None:
-            pathes_times = list(self._path_dict.items())
+        if index is not None:
+            key = self._path_dict.keys()[index]
+            return [key], [self._path_dict[key]]
+
         else:
-            start, end = time
-            if start is None:
-                start = self.min_time
-            if end is None:
-                end = self.max_time
-            pathes_times = list((path, time) for path, time in self._path_dict.items() if start <= time <= end)
+            if time is None:
+                pathes_times = list(self._path_dict.items())
+            else:
+                start, end = time
+                if start is None:
+                    start = self.min_time
+                if end is None:
+                    end = self.max_time
+                pathes_times = list((path, time) for path, time in self._path_dict.items() if start <= time <= end)
 
-        if len(pathes_times) == 0:
-            return None, None
+            if len(pathes_times) == 0:
+                return None, None
 
-        paths, times = zip(*pathes_times)
-        return paths, times
+            paths, times = zip(*pathes_times)
+            return paths, times
 
     def _create_path_dict(self):
         pass
